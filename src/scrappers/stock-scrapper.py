@@ -1,0 +1,2 @@
+def basicStockScrapper():
+    print('hello')
