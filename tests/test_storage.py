@@ -1,8 +1,13 @@
+import json
 from pathlib import Path
 
 import pandas as pd
 
-from src.collectors.storage import load_price_history, store_data_in_file
+from src.collectors.storage import (
+    load_price_history,
+    store_data_in_file,
+    store_news_in_file,
+)
 
 
 def test_price_history_round_trip(tmp_path: Path) -> None:
@@ -25,3 +30,34 @@ def test_price_history_round_trip(tmp_path: Path) -> None:
     expected = prices.copy()
     expected.index = expected.index.tz_convert("UTC")
     pd.testing.assert_frame_equal(loaded_prices, expected)
+
+
+def test_news_history_round_trip(tmp_path: Path) -> None:
+    news = [
+        {
+            "id": "sample-article",
+            "content": {
+                "title": "Caf\u00e9 company announces earnings",
+                "symbols": ["NVDA", "AAPL"],
+                "published_at": "2026-11-07T10:00:00Z",
+            },
+        }
+    ]
+    file_path = tmp_path / "news" / "NVDA.json"
+
+    store_news_in_file(news, str(file_path))
+    with file_path.open(encoding="utf-8") as file:
+        loaded_news = json.load(file)
+
+    assert loaded_news == news
+    assert "Caf\u00e9" in file_path.read_text(encoding="utf-8")
+
+
+def test_store_empty_news(tmp_path: Path) -> None:
+    file_path = tmp_path / "news" / "empty.json"
+
+    store_news_in_file([], str(file_path))
+    with file_path.open(encoding="utf-8") as file:
+        loaded_news = json.load(file)
+
+    assert loaded_news == []

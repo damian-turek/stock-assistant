@@ -1,16 +1,26 @@
-from datetime import datetime, timezone
-
-from src.collectors.news import fetch_news
-from src.collectors.storage import store_news_in_file
+from collectors.news import fetch_news
+from collectors.prices import fetch_price_history
+from collectors.storage import store_data_in_file, store_news_in_file
 
 
 def main():
-    stock = "NVDA"
-    articles = fetch_news(stock)
-    collected_at = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H%M%S%fZ")
-    file_path = f"data/raw/news/{stock}_{collected_at}.json"
-    store_news_in_file(articles, file_path)
-    print(f"{stock}: saved {len(articles)} articles to {file_path}")
+    stocks = [
+        "NVDA",
+        "AAPL",
+        "MSFT",
+        "GOOGL",
+        "AMZN",
+        "META",
+        "TSLA",
+        "BRK-B",
+        "JPM",
+    ]
+
+    for stock in stocks:
+        prices = fetch_price_history(stock, "2023-01-01", "2024-01-01")
+        store_data_in_file(prices, f"data/raw/prices/{stock}.csv")
+        news = fetch_news(stock, 10)
+        store_news_in_file(news, f"data/raw/news/{stock}.json")
 
 
 if __name__ == "__main__":
