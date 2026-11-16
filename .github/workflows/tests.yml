@@ -24,4 +24,4 @@ jobs:
         run: python -m pip install pandas yfinance pytest
 
       - name: Run tests
-        run: python -m pytest -v
+        run: PYTHONPATH=src python -m pytest -v
