@@ -1,8 +1,8 @@
 import io
 import json
 
-from collectors.google_news import fetch_google_news
-from collectors.storage import store_news_in_file
+from src.collectors.google_news import fetch_google_news
+from src.collectors.storage import store_news_in_file
 
 
 def test_fetch_google_news(monkeypatch):
@@ -26,7 +26,7 @@ def test_fetch_google_news(monkeypatch):
         return io.BytesIO(sample_xml)
 
     monkeypatch.setattr(
-        "collectors.google_news.urllib.request.urlopen",
+        "src.collectors.google_news.urllib.request.urlopen",
         mock_urlopen
     )
 
